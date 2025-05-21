@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
@@ -13,8 +13,9 @@ import { FacadeService } from 'src/app/services/facade.service';
   styleUrls: ['./eventos-screen.component.scss']
 })
 export class EventosScreenComponent implements OnInit{
+  @Input() rol:string ="";
   public name_user:string = "";
-  public rol:string = "";
+  //public rol:string = "";
   public token : string = "";
   public lista_eventos:any[] = [];
 
@@ -35,6 +36,15 @@ export class EventosScreenComponent implements OnInit{
   ){}
 
   ngOnInit(): void {
+    this.rol=this.facadeService.getUserGroup();
+    console.log("Rol user: ", this.rol);
+
+    if (this.rol==='administrador') {
+      this.displayedColumns = ['nombre', 'tipo', 'fecha', 'horario', 'lugar', 'publico', 'editar', 'eliminar'];
+    } else {
+      this.displayedColumns = ['nombre', 'tipo', 'fecha', 'horario', 'lugar', 'publico'];
+    }
+
     this.name_user = this.facadeService.getUserCompleteName();
     this.rol = this.facadeService.getUserGroup();
 

@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { ChartData, Chart } from 'chart.js';
 import DatalabelsPlugin from 'chartjs-plugin-datalabels';
 import { AdministradoresService } from 'src/app/services/administradores.service';
 
@@ -11,104 +12,185 @@ import { AdministradoresService } from 'src/app/services/administradores.service
 export class GraficasScreensComponent implements OnInit{
   //Agregar chartjs-plugin-datalabels
   //variables
-  public total_user: any={};
-  //Histograma
-  lineChartData={
-    labels:["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
-    datasets:[
+  public total_user: any = {};
+  public chart!: Chart;
+  @ViewChild('doughnutCanvas') doughnutCanvas!: ElementRef;
+
+  // Gráfico de línea (eventos por día o mes)
+  public lineChartData: ChartData<'line'> = {
+    labels: ['Enero', 'Febrero', 'Marzo', 'Abril'],
+    datasets: [
       {
-        data:[89, 34, 43, 54, 28, 74, 93],
-        label:'Registro de eventos académicos',
-        backgroundColor:'#f88406'
+        data: [0, 0, 0],
+        label: 'Eventos registrados'
       }
     ]
-  }
-  lineChartOption={
-    responsive:false
-  }
-  lineChartPlugins=[ DatalabelsPlugin ];
+  };
 
-  //Barras
-  barChartData={
-    labels:["Congreso", "FePro", "Presentación Doctoral", "Feria Matemáticas", "T-System"],
-    datasets:[
+  public lineChartOption: any = {
+    responsive: true
+  };
+  public lineChartPlugins = [DatalabelsPlugin];
+
+  // Gráfico de barras (ej. eventos por tipo)
+  public barChartData: ChartData<'bar'> = {
+    labels: ['Conferencia', 'Taller', 'Seminario', 'Concurso'],
+    datasets: [
       {
-        data:[34, 43, 54, 28, 74],
-        label: 'Registro de eventos académicos',
-        backgroundColor:[
-          '#f88406',
-          '#fcff44',
-          '#82d3fb',
-          '#fb82f5',
-          '#2ad84a'
-        ]
+        data: [0, 0, 0],
+        label: 'Usuarios por evento',
+        backgroundColor: ['#f88406', '#fcff44', '#82d3fb']
       }
     ]
-  }
-  barChartOption={
-    responsive:false
-  }
-  barChartPlugins=[ DatalabelsPlugin ];
+  };
 
-  //Circular
-  pieChartData={
-    labels:["Administradores", "Maestros", "Alumnos"],
-    datasets:[
-      {
-        data:[89, 34, 43],
-        label:'Registro de usuarios',
-        backgroundColor:[
+  public barChartOption: any = {
+    responsive: true
+  };
+  public barChartPlugins = [DatalabelsPlugin];
 
-          '#fcff44',
-          '#f1c8f2',
-          '#31e731'
-        ]
-      }
-    ]
-  }
-  pieChartOption={
-    responsive:false
-  }
-  pieChartPlugins=[ DatalabelsPlugin ];
+  // Gráfico de pastel
+  public pieChartData: ChartData<'pie'> = {
+    labels: ['Administradores', 'Maestros', 'Alumnos'],
+    datasets: [{
+      data: [0, 0, 0],
+      label: 'Usuarios registrados',
+      backgroundColor: ['#f88406', '#fcff44', '#31e731']
+    }]
+  };
 
-  //Doughnut
-  doughnutChartData={
-    labels:["Administradores", "Maestros", "Alumnos"],
-    datasets:[
-      {
-        data:[89, 34, 43],
-        label:'Registro de usuarios',
-        backgroundColor:[
-          '#f88406',
-          '#fcff44',
-          '#31e7e7'
-        ]
-      }
-    ]
-  }
-  doughnutChartOption={
-    responsive:false
-  }
-  doughnutChartPlugins=[ DatalabelsPlugin ];
+  public pieChartOption: any = {
+    responsive: true
+  };
+  public pieChartPlugins = [DatalabelsPlugin];
 
+  // Gráfico de dona
+  public doughnutChartData: ChartData<'doughnut'> = {
+    labels: ['Administradores', 'Maestros', 'Alumnos'],
+    datasets: [{
+      data: [0, 0, 0],
+      label: 'Usuarios registrados',
+      backgroundColor: ['#f88406', '#fcff44', '#31e7e7']
+    }]
+  };
 
+  public doughnutChartOption: any = {
+    responsive: true
+  };
+  public doughnutChartPlugins = [DatalabelsPlugin];
 
   constructor(
     private administradoresServices: AdministradoresService
-  ){}
+  ) {}
 
   ngOnInit(): void {
-    this.obtenerTotalUsers();
-    console.log("Data: ", this.doughnutChartData);
+    this.obtenerDatos();
+    this.obtenerEventos();
   }
 
-  public obtenerTotalUsers(){
-    this.administradoresServices.getTotalUsuarios().subscribe(
-      (response)=>{
-        this.total_user=response;
-        console.log("Total usuarios: ", this.total_user);
-      }, (error)=>{
-        alert("No se pudo obtener el total de cada rol de usuarios");
+  public obtenerDatos() {
+     this.administradoresServices.getTotalUsuarios().subscribe(
+      (response) => {
+        console.log("Datos recibidos:", response);
+        this.total_user = response;
+
+        const admin = this.total_user.admins || 0;
+        const maestros = this.total_user.maestros || 0;
+        const alumnos = this.total_user.alumnos || 0;
+
+        // Crear nuevos objetos para forzar actualización
+        this.pieChartData = {
+          labels: ['Administradores', 'Maestros', 'Alumnos'],
+          datasets: [
+            {
+              data: [admin, maestros, alumnos],
+              label: 'Usuarios registrados',
+              backgroundColor: ['#f88406', '#fcff44', '#31e731']
+            }
+          ]
+        };
+
+        this.doughnutChartData = {
+          labels: ['Administradores', 'Maestros', 'Alumnos'],
+          datasets: [
+            {
+              data: [admin, maestros, alumnos],
+              label: 'Usuarios registrados',
+              backgroundColor: ['#f88406', '#fcff44', '#31e7e7']
+            }
+          ]
+        };
+      },
+      (error) => {
+        alert("No se pudo obtener el total de usuarios");
+      }
+    );
+  }
+
+  public obtenerEventos() {
+    this.administradoresServices.getTotalEventos().subscribe(
+      (response) => {
+        const eventos: any[] = Array.isArray(response) ? response : [];
+        console.log("Tipo de dato:", typeof response);
+        console.log("¿Es arreglo?:", Array.isArray(response));
+        console.log("Datos completos:", response);
+
+
+        // Contar eventos por mes
+        const eventosPorMes = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; // Enero - Diciembre
+        const eventosPorTipo: { [key: string]: number } = {
+          "Conferencia": 0,
+          "Taller": 0,
+          "Seminario": 0,
+          "Concurso": 0
+        };
+
+        eventos.forEach(evento => {
+          // Contar por mes
+          const fecha = new Date(evento.fecha_realizacion);
+          if (fecha instanceof Date && !isNaN(fecha.getMonth())) {
+            const mesIndex = fecha.getMonth(); // 0-11
+            eventosPorMes[mesIndex] += 1;
+          }
+
+          // Contar por tipo
+          const tipo = evento.tipo_evento;
+          if (tipo in eventosPorTipo) {
+            eventosPorTipo[tipo] += 1;
+          }
+        });
+
+        // Actualizar gráfico de línea (eventos por mes)
+        this.lineChartData = {
+          labels: [
+            'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun',
+            'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'
+          ],
+          datasets: [{
+            data: eventosPorMes,
+            label: 'Eventos por mes',
+            borderColor: '#f88406',
+            backgroundColor: '#f88406'
+          }]
+        };
+
+        // Actualizar gráfico de barras (eventos por tipo)
+        this.barChartData = {
+          labels: Object.keys(eventosPorTipo),
+          datasets: [{
+            data: Object.values(eventosPorTipo),
+            label: 'Eventos por tipo',
+            backgroundColor: ['#f88406', '#fcff44', '#31e731']
+          }]
+        };
+
+        // Forzar actualización de gráficas
+        this.lineChartData = { ...this.lineChartData };
+        this.barChartData = { ...this.barChartData };
+
+      },
+      (error) => {
+        alert("No se pudieron cargar los eventos");
       }
     );
   }

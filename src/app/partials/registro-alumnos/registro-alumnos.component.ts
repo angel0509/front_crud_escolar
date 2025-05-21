@@ -11,7 +11,7 @@ declare var $:any;
   styleUrls: ['./registro-alumnos.component.scss']
 })
 export class RegistroAlumnosComponent implements OnInit{
-  @Input() rol: string = "";
+   @Input() rol: string = "";
   @Input() datos_user: any = {};
 
   //Para contraseñas
@@ -35,21 +35,21 @@ export class RegistroAlumnosComponent implements OnInit{
   ){}
 
   ngOnInit(): void {
-      //El primer if valida si existe un parámetro en la URL
-    if(this.activatedRoute.snapshot.params['id'] != undefined){
-      this.editar = true;
+    //El priimer if valida si existe un parametro en la URL
+    if(this.activatedRoute.snapshot.params['id']!=undefined){
+      this.editar=true;
       //Asignamos a nuestra variable global el valor del ID que viene por la URL
-      this.idUser = this.activatedRoute.snapshot.params['id'];
-      console.log("ID User: ", this.idUser);
+      this.idUser=this.activatedRoute.snapshot.params['id'];
+      console.log("ID User: ",this.idUser);
       //Al iniciar la vista asignamos los datos del user
-      this.alumno = this.datos_user;
+      this.alumno=this.datos_user;
     }else{
       this.alumno = this.alumnosService.esquemaAlumno();
       this.alumno.rol = this.rol;
       this.token = this.facadeService.getSessionToken();
     }
-    //Imprimir datos en consola
-    console.log("Alumno: ", this.alumno);
+    //Imprimir datos en la consola
+    console.log("Los datos del alumno son: ", this.alumno);
   }
 
   //Funciones para password
@@ -89,37 +89,35 @@ export class RegistroAlumnosComponent implements OnInit{
     if(!$.isEmptyObject(this.errors)){
       return false;
     }
-
-    // validar contrasenas
     if(this.alumno.password == this.alumno.confirmar_password){
-      //logica del programa para registrar usuario
+      //Ejecuta
       this.alumnosService.registrarAlumno(this.alumno).subscribe(
         (response)=>{
-          //ejecucion del servicio si todo es correcto
+          //aquí va la ejecución del servicio si todo es correcto
           alert("Usuario registrado correctamente");
           console.log("Usuario registrado: ", response);
-          if(this.token !=""){
+          if(this.token != ""){
             this.router.navigate(["home"]);
           }else{
             this.router.navigate(["/"]);
           }
         }, (error)=>{
-          //ejecucion del error
-          alert("No se pudo registrar al usuario");
+          //Aquí se ejecuta el error
+          alert("No se pudo registrar el usuario");
         }
       );
     }else{
-      alert("Las contrasenas no coinciden");
+      alert("Las contraseñas no coinciden");
       this.alumno.password="";
       this.alumno.confirmar_password="";
     }
   }
 
   public actualizar(){
-    //Validación
-    this.errors = [];
+    //Validacion
+    this.errors=[];
 
-    this.errors = this.alumnosService.validarAlumno(this.alumno, this.editar);
+    this.errors=this.alumnosService.validarAlumno(this.alumno, this.editar);
     if(!$.isEmptyObject(this.errors)){
       return false;
     }
@@ -129,12 +127,12 @@ export class RegistroAlumnosComponent implements OnInit{
       (response)=>{
         alert("Alumno editado correctamente");
         console.log("Alumno editado: ", response);
-        //Si se editó, entonces mandar al home
+        //Si se editó bien, entonces mandar al Home
         this.router.navigate(["home"]);
       }, (error)=>{
         alert("No se pudo editar el alumno");
       }
-    );
+    )
   }
 
   //Función para detectar el cambio de fecha

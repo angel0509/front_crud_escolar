@@ -24,7 +24,7 @@
     public esquemaAlumno(){
       return {
         'rol':'',
-        'matricula': '',
+        'matricula_alumno': '',
         'first_name': '',
         'last_name': '',
         'email': '',
@@ -45,8 +45,8 @@
 
       let error: any = [];
 
-      if(!this.validatorService.required(data["matricula"])){
-        error["matricula"] = this.errorService.required;
+      if(!this.validatorService.required(data["matricula_alumno"])){
+        error["matricula_alumno"] = this.errorService.required;
       }
       if(!this.validatorService.required(data["first_name"])){
         error["first_name"] = this.errorService.required;

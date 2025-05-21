@@ -142,4 +142,11 @@ export class AdministradoresService {
     return this.http.get<any>(`${environment.url_api}/admins-edit/`, {headers:headers});
   }
 
+  //Obtener el total de eventos
+  getTotalEventos() {
+    var token = this.facadeService.getSessionToken();
+    var headers = new HttpHeaders({'Content-Type': 'application/json', 'Authorization': 'Bearer '+token});
+    return this.http.get(`${environment.url_api}/total-eventos/`, { headers });
+  }
+
 }

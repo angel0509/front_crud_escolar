@@ -7,7 +7,7 @@
         <div class="col-12">
           <span class="title-perfil">Bienvenido {{name_user}}</span>
           <br><br>
-          <span class="title-perfil">Administrador</span>
+          <span class="title-perfil">{{this.rol}}</span>
         </div>
       </div>
       <div class="container">
@@ -71,16 +71,16 @@
                   <td mat-cell *matCellDef="let element"> {{element.cupo_maximo}} </td>
               </ng-container>
 
-              <ng-container matColumnDef="editar">
+              <ng-container matColumnDef="editar" *ngIf="rol==='administrador'">
                   <th mat-header-cell *matHeaderCellDef> Actualizar </th>
                   <td mat-cell *matCellDef="let element" class="td-editar">
                       <i class="bi bi-pencil-square" (click)="goEditar(element.id)"></i>
                   </td>
               </ng-container>
 
-              <ng-container matColumnDef="eliminar">
-                  <th mat-header-cell *matHeaderCellDef> Eliminar </th>
-                  <td mat-cell *matCellDef="let element" class="td-eliminar">
+              <ng-container matColumnDef="eliminar" *ngIf="rol==='administrador'">
+                  <th mat-header-cell *matHeaderCellDef > Eliminar </th>
+                  <td mat-cell *matCellDef="let element"  class="td-eliminar">
                       <i class="bi bi-trash3-fill" (click)="delete(element.id)"></i>
                   </td>
               </ng-container>

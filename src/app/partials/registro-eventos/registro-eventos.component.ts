@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Location } from '@angular/common';
-import { MatTableDataSource } from '@angular/material/table';
+import { MatDialog } from '@angular/material/dialog';
 import { EventosService } from 'src/app/services/eventos.service';
-import { FacadeService } from 'src/app/services/facade.service';
 import { ActivatedRoute } from '@angular/router';
+import { EditarEventoComponent } from 'src/app/modals/editar-evento/editar-evento.component';
 declare var $:any;
 
 @Component({
@@ -46,7 +46,7 @@ export class RegistroEventosComponent implements OnInit {
     private router:Router,
     private eventosService: EventosService,
     private route: ActivatedRoute,
-    private facadeService: FacadeService,
+    private dialog: MatDialog,
   ){}
 
   ngOnInit(): void {
@@ -130,7 +130,7 @@ export class RegistroEventosComponent implements OnInit {
     );
   }
 
-  public actualizar(){
+public actualizar(){
     this.errors = this.eventosService.validarEvento(this.evento, this.editar);
 
     if (!$.isEmptyObject(this.errors)) {
@@ -169,17 +169,10 @@ export class RegistroEventosComponent implements OnInit {
         return false;
       }
     }
-        this.eventosService.editarEvento(this.evento).subscribe(
-          (response) => {
-            alert("Evento actualizado correctamente");
-            this.router.navigate(["/eventos"]);
-          },
-          (error) => {
-            alert("No se pudo actualizar el evento");
-            console.error("Error al guardar:", error);
-          }
-        );
-  }
+
+    this.abrirModalEditar(this.evento);
+
+  }
 
   //checkbox
 
@@ -287,18 +280,39 @@ export class RegistroEventosComponent implements OnInit {
       );
     }
 
-}
+    public abrirModalEditar(idUser: number) {
+      const dialogRef = this.dialog.open(EditarEventoComponent, {
+        data: { evento: this.evento },
+        height: '288px',
+        width: '328px'
+      });
 
-export interface DatosUsuario {
-  name:string,
-  tipo_evento: string,
-  fecha_realizacion: string,
-  hora_inicio: string,
-  hora_fin: string,
-  lugar: string,
-  publico_json: string,
-  programa_educativo: string,
-  responsable: string,
-  descripcion: string,
-  cupo_maximo: number;
+      dialogRef.afterClosed().subscribe(result => {
+        if (result?.isEdited) {
+          //confirmado → Mandar al backend
+
+          // Convertir publico_json a string antes de enviar
+          const eventoParaEnviar = {
+            ...this.evento,
+            publico_json: JSON.stringify(this.evento.publico_json)
+          };
+
+          this.eventosService.editarEvento(eventoParaEnviar).subscribe(
+            (response) => {
+              alert("Evento actualizado correctamente");
+              this.router.navigate(["/eventos"]);
+            },
+            (error) => {
+              alert("No se pudo actualizar el evento");
+              console.error("Error al guardar:", error);
+            }
+          );
+        } else {
+          //Cancelado → No hacer nada
+          console.log("Edición cancelada por el usuario");
+        }
+      });
+    }
+
+
 }
